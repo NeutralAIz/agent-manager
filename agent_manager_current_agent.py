@@ -21,10 +21,13 @@ class CurrentAgentTool(BaseTool):
         description : The description.
         args_schema : The args schema.
     """
-    name: str = "Current Agent"
     agent_id: int = None
-    args_schema: Type[BaseModel] = CurrentAgentInput
-    description: str = "prints the current agent object as JSON"
+    name = "Current Agent"
+    description = (
+        "Prints the current agent object as JSON"
+    )
+    args_schema: Type[CurrentAgentInput] = CurrentAgentInput
+    
 
     def _execute(self):
         """

@@ -22,9 +22,11 @@ class ListAgentTool(BaseTool):
         description : The description.
         args_schema : The args schema.
     """
-    name: str = "List Agent"
-    args_schema: Type[BaseModel] = ListAgentInput
-    description: str = "Prints all the agent objects as JSON from the default project"
+    name = "List Agent"
+    description = (
+        "Prints all the agent objects as JSON from the default project"
+    )
+    args_schema: Type[ListAgentInput] = ListAgentInput
 
     def _execute(self, Authorize: AuthJWT = Depends(check_auth)):
         """
