@@ -6,7 +6,15 @@ from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
 from superagi.models.agent import Agent
 
+from datetime import date, datetime
 
+# This class is a custom JSON encoder that encodes dates and datetimes
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (date, datetime)):
+            return obj.isoformat()
+        return super().default(obj)
+    
 class CurrentAgentInput(BaseModel):
     pass
 
@@ -54,5 +62,6 @@ class CurrentAgentTool(BaseTool):
         } 
         """
         agent = Agent.get_agent_from_id(session=self.toolkit_config.session, agent_id=self.agent_id)
-        return json.dumps(agent, default=lambda x: x.__dict__)
+        agent_dict = {column.name: getattr(agent, column.name) for column in agent.__table__.columns}
+        return json.dumps(agent_dict, cls=DateTimeEncoder)
 
