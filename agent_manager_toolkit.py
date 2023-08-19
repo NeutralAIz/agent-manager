@@ -5,7 +5,7 @@ from agent_manager_list_agent import ListAgentInput
 from agent_manager_current_agent import CurrentAgentInput
 
 
-class PyppeteerWebScrapperToolkit(BaseToolkit, ABC):
+class AgentManagerToolkit(BaseToolkit, ABC):
     name: str = "Agent Manager Toolkit"
     description: str = "Tools to view and interact with other SuperAGI agents in the same instance."
 
