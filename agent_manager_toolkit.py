@@ -4,9 +4,8 @@ from superagi.tools.base_tool import BaseTool, BaseToolkit
 from agent_manager_list_agent import ListAgentInput
 from agent_manager_current_agent import CurrentAgentInput
 
-
 class AgentManagerToolkit(BaseToolkit, ABC):
-    name: str = "Agent Manager Toolkit"
+    name: str = "AgentManager Toolkit"
     description: str = "Tools to view and interact with other SuperAGI agents in the same instance."
 
     def get_tools(self) -> List[BaseTool]:

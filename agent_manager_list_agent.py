@@ -19,14 +19,16 @@ class ListAgentTool(BaseTool):
     List Agent tool
     Attributes:
         name : The name.
-        description : The description.
         args_schema : The args schema.
+        description : The description.
+        agent_id : Current agent id
+        agent_execution : Current agent execution
     """
-    name = "List Agent"
-    description = (
-        "Prints all the agent objects as JSON from the default project"
-    )
+    name: str = "List Agent Tool"
     args_schema: Type[ListAgentInput] = ListAgentInput
+    description: str = "Prints all the agent objects as JSON from the default project"
+    agent_id: int = None
+    agent_execution_id: int = None
 
     def _execute(self, Authorize: AuthJWT = Depends(check_auth)):
         """
