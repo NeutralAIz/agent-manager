@@ -1,5 +1,6 @@
 import json
-
+ 
+from typing import Type 
 from pydantic import BaseModel, Field
 
 from superagi.tools.base_tool import BaseTool

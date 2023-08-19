@@ -1,3 +1,5 @@
+from typing import Type 
+
 from fastapi_jwt_auth import AuthJWT
 from fastapi_sqlalchemy import db
 from pydantic import BaseModel, Field
