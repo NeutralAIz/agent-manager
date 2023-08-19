@@ -1,4 +1,5 @@
 from typing import Type 
+from fastapi import Depends
 
 from fastapi_jwt_auth import AuthJWT
 from fastapi_sqlalchemy import db
