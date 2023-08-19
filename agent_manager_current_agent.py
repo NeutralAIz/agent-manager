@@ -17,17 +17,16 @@ class CurrentAgentTool(BaseTool):
 
     Attributes:
         name : The name.
-        agent_id: The agent id.
-        description : The description.
         args_schema : The args schema.
+        description : The description.
+        agent_id: The agent id.
+        agent_execution_id : Current Execition
     """
-    agent_id: int = None
-    name = "Current Agent"
-    description = (
-        "Prints the current agent object as JSON"
-    )
+    name: str = "Current Agent Tool"
     args_schema: Type[CurrentAgentInput] = CurrentAgentInput
-    
+    description: str = "Prints the current agent object as JSON"
+    agent_id: int = None
+    agent_execution_id: int = None    
 
     def _execute(self):
         """
