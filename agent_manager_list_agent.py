@@ -35,8 +35,8 @@ class ListAgentTool(BaseTool):
         targetProject = get_user_organisation_project()
 
         # Get all agents for default project
-        agents = db.session.query(Agent).filter(Agent.project_id == targetProject.id).all()
+        #agents = db.session.query(Agent).filter(Agent.project_id == targetProject.id).all()
 
-        agent_list = [agent.__dict__ for agent in agents] 
+        #agent_list = [agent.__dict__ for agent in agents] 
 
-        return json.dumps(agent_list)
+        return 'hi'#json.dumps(agent_list)
