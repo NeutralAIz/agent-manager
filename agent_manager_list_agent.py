@@ -30,14 +30,12 @@ class ListAgentTool(BaseTool):
     agent_id: int = None
     agent_execution_id: int = None
 
-    def _execute(self, Authorize: AuthJWT = Depends(check_auth)):
+    def _execute(self, organisation: Organisation = Depends(get_user_organisation), Authorize: AuthJWT = Depends(check_auth)):
         """
         Execute the List Agent tool.
         Returns:
             JSON representation of all the agents from default project
         """  
-        # Get current user organisation
-        organisation = get_user_organisation(Authorize)
 
         # Get default project for the organisation
         default_project = Project.find_or_create_default_project(db.session, organisation.id)
