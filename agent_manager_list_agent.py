@@ -2,10 +2,10 @@ import json
 from typing import Type 
 from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
-from superagi.helper.auth import get_user_organisation_project
-from superagi.models.agent import Agent
-from fastapi_sqlalchemy import db
-from superagi.config.config import get_config
+#from superagi.helper.auth import get_user_organisation_project
+#from superagi.models.agent import Agent
+#from fastapi_sqlalchemy import db
+#from superagi.config.config import get_config
 
 class ListAgentInput(BaseModel):
     pass
@@ -32,7 +32,7 @@ class ListAgentTool(BaseTool):
         Returns:
             JSON representation of all the agents from default project
         """  
-        targetProject = get_user_organisation_project()
+        #targetProject = get_user_organisation_project()
 
         # Get all agents for default project
         #agents = db.session.query(Agent).filter(Agent.project_id == targetProject.id).all()
