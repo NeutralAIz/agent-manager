@@ -1,6 +1,6 @@
-import json
+#import json
 from typing import Type 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel#, Field
 from superagi.tools.base_tool import BaseTool
 #from superagi.helper.auth import get_user_organisation_project
 #from superagi.models.agent import Agent
@@ -39,4 +39,4 @@ class ListAgentTool(BaseTool):
 
         #agent_list = [agent.__dict__ for agent in agents] 
 
-        return 'hi'#json.dumps(agent_list)
+        return self  #json.dumps(agent_list)
