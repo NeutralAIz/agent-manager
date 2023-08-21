@@ -32,7 +32,7 @@ class ListAgentTool(BaseTool):
         Returns:
             JSON representation of all the agents from default project
         """  
-        targetProject = get_user_organisation_project()
+        #targetProject = get_user_organisation_project()
 
         # Get all agents for default project
         #agents = db.session.query(Agent).filter(Agent.project_id == targetProject.id).all()
