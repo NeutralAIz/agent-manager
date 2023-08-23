@@ -38,8 +38,10 @@ class ListAgentTool(BaseTool):
         """  
         targetProject = get_user_organisation_project()
 
+        session = Session()
+
         # Get all agents for default project
-        #agents = db.session.query(Agent).filter(Agent.project_id == targetProject.id).all()
+        agents = session.query(Agent).filter(Agent.project_id == targetProject.id).all()
 
         #agent_list = [agent.__dict__ for agent in agents] 
 
