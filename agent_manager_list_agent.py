@@ -1,11 +1,15 @@
 import json
-import superagi.models.db
 from typing import Type 
 from pydantic import BaseModel#, Field
 from superagi.tools.base_tool import BaseTool
+from superagi.models.db import connect_db
+from sqlalchemy.orm import sessionmaker
 from superagi.helper.auth import get_user_organisation_project
 #from superagi.models.agent import Agent
 #from superagi.config.config import get_config
+
+engine = connect_db()
+Session = sessionmaker(bind=engine)
 
 class ListAgentInput(BaseModel):
     pass
