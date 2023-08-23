@@ -1,8 +1,8 @@
-#import json
+import json
+import superagi.models.db
 from typing import Type 
 from pydantic import BaseModel#, Field
 from superagi.tools.base_tool import BaseTool
-from fastapi_sqlalchemy import db
 from superagi.helper.auth import get_user_organisation_project
 #from superagi.models.agent import Agent
 #from superagi.config.config import get_config
@@ -32,6 +32,7 @@ class ListAgentTool(BaseTool):
         Returns:
             JSON representation of all the agents from default project
         """  
+        db = connect_db()
         targetProject = get_user_organisation_project()
 
         # Get all agents for default project
