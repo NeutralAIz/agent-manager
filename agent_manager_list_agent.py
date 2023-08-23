@@ -36,7 +36,6 @@ class ListAgentTool(BaseTool):
         Returns:
             JSON representation of all the agents from default project
         """  
-        db = connect_db()
         targetProject = get_user_organisation_project()
 
         # Get all agents for default project
