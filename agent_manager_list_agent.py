@@ -2,9 +2,9 @@
 from typing import Type 
 from pydantic import BaseModel#, Field
 from superagi.tools.base_tool import BaseTool
+from fastapi_sqlalchemy import db
 from superagi.helper.auth import get_user_organisation_project
 #from superagi.models.agent import Agent
-#from fastapi_sqlalchemy import db
 #from superagi.config.config import get_config
 
 class ListAgentInput(BaseModel):
