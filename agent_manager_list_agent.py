@@ -5,8 +5,7 @@ from superagi.tools.base_tool import BaseTool
 from superagi.models.toolkit import Toolkit
 from superagi.models.agent import Agent
 from superagi.models.project import Project
-from superagi.models.organization import Organisation
-from superagi.models.configuration import Configuration
+from superagi.models.organisation import Organisation
 
 
 class ListAgentInput(BaseModel):
