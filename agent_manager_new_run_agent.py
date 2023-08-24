@@ -10,6 +10,7 @@ from dataclasses import dataclass, asdict
 
 from pydantic import BaseModel
 
+from superagi.lib.logger import logger
 #from superagi.controllers.types.agent_schedule import AgentScheduleInput
 #from superagi.controllers.tool import ToolOut
 from superagi.tools.base_tool import BaseTool
@@ -177,12 +178,14 @@ class NewRunAgentTool(BaseTool):
         description : The description.
         agent_id : Current agent id
         agent_execution : Current agent execution
+        target_agent_id : Target agent to create new run for
     """
     name: str = "New Run Agent Tool"
     args_schema: Type[NewRunAgentInput] = NewRunAgentInput
     description: str = "Creates a new run for the specified agent and starts it."
     agent_id: int = None
     agent_execution_id: int = None
+    target_agent_id: int = None
             
     def _execute(self, target_agent_id: int):
         """
