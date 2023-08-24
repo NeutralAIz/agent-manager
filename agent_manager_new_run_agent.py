@@ -115,7 +115,7 @@ def create_agent_execution(agent_execution: AgentExecutionIn, session):
     """
 
     # Checking if the agent exists
-    agent = session.query(Agent).filter(Agent.id == agent_execution.agent_id, Agent.is_deleted == False).first()
+    agent = session.query(Agent).filter(Agent.id == agent_execution['agent_id'], Agent.is_deleted == False).first()
     if not agent:
         print("Agent not found")
         return None
