@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Any, Type
 from pydantic import BaseModel#, Field
 from sqlalchemy import inspect
@@ -17,6 +17,38 @@ from uuid import UUID
 from enum import Enum
 
 
+def json_serial(obj):
+    if isinstance(obj, (datetime, date, time)):
+        return obj.isoformat()
+    elif isinstance(obj, timedelta):
+        return str(obj)
+    elif isinstance(type(obj), DeclarativeMeta):  # Handle all SQLAlchemy objects
+        return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
+    elif isinstance(obj, UUID):  # Handle UUID objects.
+        return str(obj)
+    elif isinstance(obj, decimal.Decimal):  # Handle Decimal objects.
+        return float(obj)
+    elif isinstance(obj, Enum):  # Handle Enum objects.
+        return obj.name
+    elif isinstance(obj, InstrumentedList):  # Handle SQLAlchemy relationship objects.
+        return [serialize(elem) for elem in obj]
+    elif isinstance(obj, Iterable):
+        return [serialize(item) for item in obj]
+    raise TypeError("Type %s not serializable" % type(obj)) 
+
+def serialize(obj):
+    if type(obj) is list:
+        return [serialize(i) for i in obj]
+    elif isinstance(obj, (str, int, float, bool)) or obj is None:
+        return obj
+    elif isinstance(obj, dict):
+        obj = obj.copy()
+        for key in obj:
+            obj[key] = serialize(obj[key])
+        return obj
+    else:
+        return json_serial(obj)
+
 class ListAgentInput(BaseModel):
     pass
 
@@ -26,10 +58,8 @@ class ListAgentOutput:
     project: Any
     agents: Any
 
-    def __init__(self, organisation, project, agents):
-        self.organisation = organisation
-        self.project = project
-        self.agents = agents
+def to_json(self):
+    return json.dumps(asdict(self), default=json_serial)
 
 class ListAgentTool(BaseTool):
     """
@@ -54,38 +84,6 @@ class ListAgentTool(BaseTool):
             JSON representation of all the agents from default project
         """
     
-        def json_serial(obj):
-            if isinstance(obj, (datetime, date, time)):
-                return obj.isoformat()
-            elif isinstance(obj, timedelta):
-                return str(obj)
-            elif isinstance(type(obj), DeclarativeMeta):  # Handle all SQLAlchemy objects
-                return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
-            elif isinstance(obj, UUID):  # Handle UUID objects.
-                return str(obj)
-            elif isinstance(obj, decimal.Decimal):  # Handle Decimal objects.
-                return float(obj)
-            elif isinstance(obj, Enum):  # Handle Enum objects.
-                return obj.name
-            elif isinstance(obj, InstrumentedList):  # Handle SQLAlchemy relationship objects.
-                return [serialize(elem) for elem in obj]
-            elif isinstance(obj, Iterable):
-                return [serialize(item) for item in obj]
-            raise TypeError("Type %s not serializable" % type(obj)) 
-        
-        def serialize(obj):
-            if type(obj) is list:
-                return [serialize(i) for i in obj]
-            elif isinstance(obj, (str, int, float, bool)) or obj is None:
-                return obj
-            elif isinstance(obj, dict):
-                obj = obj.copy()
-                for key in obj:
-                    obj[key] = serialize(obj[key])
-                return obj
-            else:
-                return json_serial(obj)
-    
         session = self.toolkit_config.session
 
         toolkit = session.query(Toolkit).filter(Toolkit.id == self.toolkit_config.toolkit_id).first()
@@ -95,4 +93,4 @@ class ListAgentTool(BaseTool):
 
         results = ListAgentOutput(organisation, project, agents)
 
-        return json.dumps(results, default=json_serial)
+        return results.to_json()
