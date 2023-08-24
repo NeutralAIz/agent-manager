@@ -106,7 +106,7 @@ class AgentExecutionIn(BaseModel):
     class config:
         orm_mode = True
 
-def create_agent_execution(agent_id: int, agent_config: AgentExecutionIn, session):
+def create_agent_execution(agent_id: int, agent_config_in: AgentExecutionIn, session):
     """
     Create a new agent execution/run.
 
@@ -124,14 +124,14 @@ def create_agent_execution(agent_id: int, agent_config: AgentExecutionIn, sessio
     iteration_step_id = IterationWorkflow.fetch_trigger_step_id(session, start_step.action_reference_id).id if start_step.action_type == "ITERATION_WORKFLOW" else -1
 
     db_agent_execution = AgentExecution(status="RUNNING", last_execution_time=datetime.now(),
-                                        agent_id=agent_id, name=agent_config.name, num_of_calls=0,
+                                        agent_id=agent_id, name=agent_config_in['name'], num_of_calls=0,
                                         num_of_tokens=0,
                                         current_agent_step_id=start_step.id,
                                         iteration_workflow_step_id=iteration_step_id)
 
     agent_execution_configs = {
-        "goal": agent_config.goal,
-        "instruction": agent_config.instruction
+        "goal": agent_config_in['goal'],
+        "instruction": agent_config_in['instruction']
     }
 
     agent_configs = session.query(AgentConfiguration).filter(AgentConfiguration.agent_id == agent_id).all()
@@ -189,22 +189,21 @@ class NewRunAgentTool(BaseTool):
         Returns:
             JSON representation of the agent ID
         """
-        #try:
+        try:
 
-        session = self.toolkit_config.session
+            session = self.toolkit_config.session
 
-        # Fetching the last configuration of the target agent
-        agent_config = get_agent_execution_configuration(target_agent_id, session)
-        
-    
-        # Creating a new execution of the target agent 
-        agent_execution_created = create_agent_execution(target_agent_id, agent_config, session)
+            # Fetching the last configuration of the target agent
+            agent_config = get_agent_execution_configuration(target_agent_id, session)
+            
+            # Creating a new execution of the target agent 
+            agent_execution_created = create_agent_execution(target_agent_id, agent_config, session)
 
-        return json.dumps(agent_execution_created, default = json_serial)
-        # except:
-        #     traceback.print_exc()
-        # finally:
-        #     return {
-        #         'agent_id': target_agent_id,
-        #         'agent_execution_id': agent_execution_created.id if agent_execution_created != None else None
-        #     }
+            #return json.dumps(agent_execution_created, default = json_serial)
+        except:
+            traceback.print_exc()
+        finally:
+            return {
+                'agent_id': target_agent_id,
+                'agent_execution_id': agent_execution_created.id if agent_execution_created != None else None
+            }
