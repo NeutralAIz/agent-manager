@@ -68,4 +68,4 @@ class ListAgentTool(BaseTool):
         except:
             traceback.print_exc()
         finally:
-            return results.to_json() if results != None else None
+            return results.to_json() if results != None else 
