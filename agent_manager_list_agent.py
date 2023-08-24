@@ -81,4 +81,9 @@ class ListAgentTool(BaseTool):
         project = session.query(Project).filter(Project.organisation_id == organisation.id).first()
         agents = session.query(Agent).filter(Agent.project_id == project.id).all()
 
-        return json.dumps(serialize(agents), default=json_serial)
+        return [
+            json.dumps(serialize(toolkit), default=json_serial),
+            json.dumps(serialize(organisation), default=json_serial),
+            json.dumps(serialize(project), default=json_serial),
+            json.dumps(serialize(agents), default=json_serial),
+        ]
