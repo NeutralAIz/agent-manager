@@ -1,6 +1,6 @@
 import json
 import ast
-from typing import Any, Type, Optional, Union
+from typing import Any, Type, Optional, Union, List
 from datetime import datetime
 from sqlalchemy import func, or_, desc
 from sqlalchemy.orm import Session
@@ -164,9 +164,8 @@ def create_agent_execution(agent_execution: AgentExecutionIn, session):
         execute_agent.delay(db_agent_execution.id, datetime.now())
 
     return db_agent_execution
-
 class NewRunAgentInput(BaseModel):
-    pass
+    target_agent_id: int
 
 class NewRunAgentTool(BaseTool):
     """
@@ -180,11 +179,11 @@ class NewRunAgentTool(BaseTool):
     """
     name: str = "New Run Agent Tool"
     args_schema: Type[NewRunAgentInput] = NewRunAgentInput
-    description: str = "Creates a new run for the agent and starts it."
+    description: str = "Creates a new run for the specified agent and starts it."
     agent_id: int = None
     agent_execution_id: int = None
             
-    def _execute(self):
+    def _execute(self, target_agent_id: int):
         """
         Execute the Save Scheduled Agent Tool.
         Returns:
@@ -193,13 +192,14 @@ class NewRunAgentTool(BaseTool):
 
         session = self.toolkit_config.session
 
-        # Fetching the last configuration of the agent
-        agent_config = get_agent_execution_configuration(self.agent_id, session)
+        # Fetching the last configuration of the target agent
+        agent_config = get_agent_execution_configuration(target_agent_id, session)
         agent_execution_config_json = json.dumps(agent_config)
 
-        # Creating a new execution of the agent 
+        # Creating a new execution of the target agent 
         agent_execution_created = create_agent_execution(json.loads(agent_execution_config_json), session)
 
         return {
-            'agent_id': self.agent_id
+            'agent_id': target_agent_id,
+            'agent_execution_id': agent_execution_created.id
         }
