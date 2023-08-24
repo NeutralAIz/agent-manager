@@ -4,6 +4,7 @@ from typing import Any, Type, Optional, Union, List
 from datetime import datetime
 from sqlalchemy import func, or_, desc
 from sqlalchemy.orm import Session
+from agent_manager_helpers import json_serial
 
 from dataclasses import dataclass, asdict
 
@@ -194,7 +195,7 @@ class NewRunAgentTool(BaseTool):
 
         # Fetching the last configuration of the target agent
         agent_config = get_agent_execution_configuration(target_agent_id, session)
-        agent_execution_config_json = json.dumps(agent_config)
+        agent_execution_config_json = json.dumps(agent_config, json_serial)
 
         # Creating a new execution of the target agent 
         agent_execution_created = create_agent_execution(json.loads(agent_execution_config_json), session)
