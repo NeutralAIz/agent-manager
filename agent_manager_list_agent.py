@@ -1,3 +1,5 @@
+import traceback
+
 import json
 from agent_manager_helpers import json_serial
 from dataclasses import dataclass, asdict
@@ -54,13 +56,16 @@ class ListAgentTool(BaseTool):
             JSON representation of all the agents from default project
         """
     
-        session = self.toolkit_config.session
+        try:
+            session = self.toolkit_config.session
 
-        toolkit = session.query(Toolkit).filter(Toolkit.id == self.toolkit_config.toolkit_id).first()
-        organisation = session.query(Organisation).filter(Organisation.id == toolkit.organisation_id).first()
-        project = session.query(Project).filter(Project.organisation_id == organisation.id).first()
-        agents = session.query(Agent).filter(Agent.project_id == project.id).all()
+            toolkit = session.query(Toolkit).filter(Toolkit.id == self.toolkit_config.toolkit_id).first()
+            organisation = session.query(Organisation).filter(Organisation.id == toolkit.organisation_id).first()
+            project = session.query(Project).filter(Project.organisation_id == organisation.id).first()
+            agents = session.query(Agent).filter(Agent.project_id == project.id).all()
 
-        results = ListAgentOutput(organisation, project, agents)
-
-        return results.to_json()
+            results = ListAgentOutput(organisation, project, agents)
+        except:
+            traceback.print_exc()
+        finally:
+            return results.to_json() if results != None else None
