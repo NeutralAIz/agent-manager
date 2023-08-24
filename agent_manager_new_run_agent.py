@@ -106,7 +106,7 @@ class AgentExecutionIn(BaseModel):
     class config:
         orm_mode = True
 
-def create_agent_execution(agent_execution: AgentExecutionIn, session):
+def create_agent_execution(agent_id: int, agent_config: AgentExecutionIn, session):
     """
     Create a new agent execution/run.
 
@@ -115,28 +115,26 @@ def create_agent_execution(agent_execution: AgentExecutionIn, session):
     """
 
     # Checking if the agent exists
-    agent = session.query(Agent).filter(Agent.id == agent_execution['agent_id'], Agent.is_deleted == False).first()
+    agent = session.query(Agent).filter(Agent.id == agent_id, Agent.is_deleted == False).first()
     if not agent:
         print("Agent not found")
         return None
 
-    start_step = AgentWorkflow.fetch_trigger_step_id(db.session, agent.agent_workflow_id)
-    iteration_step_id = IterationWorkflow.fetch_trigger_step_id(
-        session, start_step.action_reference_id).id if start_step.action_type == "ITERATION_WORKFLOW" else -1
+    start_step = AgentWorkflow.fetch_trigger_step_id(session, agent.agent_workflow_id)
+    iteration_step_id = IterationWorkflow.fetch_trigger_step_id(session, start_step.action_reference_id).id if start_step.action_type == "ITERATION_WORKFLOW" else -1
 
     db_agent_execution = AgentExecution(status="RUNNING", last_execution_time=datetime.now(),
-                                        agent_id=agent_execution.agent_id, name=agent_execution.name, num_of_calls=0,
+                                        agent_id=agent_id, name=agent_config.name, num_of_calls=0,
                                         num_of_tokens=0,
                                         current_agent_step_id=start_step.id,
                                         iteration_workflow_step_id=iteration_step_id)
 
     agent_execution_configs = {
-        "goal": agent_execution.goal,
-        "instruction": agent_execution.instruction
+        "goal": agent_config.goal,
+        "instruction": agent_config.instruction
     }
 
-    agent_configs = session.query(AgentConfiguration).filter(
-        AgentConfiguration.agent_id == agent_execution.agent_id).all()
+    agent_configs = session.query(AgentConfiguration).filter(AgentConfiguration.agent_id == agent_id).all()
     keys_to_exclude = ["goal", "instruction"]
     for agent_config in agent_configs:
         if agent_config.key not in keys_to_exclude:
@@ -158,10 +156,7 @@ def create_agent_execution(agent_execution: AgentExecutionIn, session):
     session.add(db_agent_execution)
     session.commit()
     session.flush()
-    AgentExecutionConfiguration.add_or_update_agent_execution_config(
-        session=session, execution=db_agent_execution, agent_execution_configs=agent_execution_configs)
-
-    organisation = agent.get_agent_organisation(session)
+    AgentExecutionConfiguration.add_or_update_agent_execution_config(session=session, execution=db_agent_execution, agent_execution_configs=agent_execution_configs)
 
     if db_agent_execution.status == "RUNNING":
         execute_agent.delay(db_agent_execution.id, datetime.now())
@@ -201,10 +196,11 @@ class NewRunAgentTool(BaseTool):
         # Fetching the last configuration of the target agent
         agent_config = get_agent_execution_configuration(target_agent_id, session)
         
-        return json.dumps(agent_config, default = json_serial)
+    
         # Creating a new execution of the target agent 
-    #     agent_execution_created = create_agent_execution(agent_config, session)
+        agent_execution_created = create_agent_execution(target_agent_id, agent_config, session)
 
+        return json.dumps(agent_execution_created, default = json_serial)
         # except:
         #     traceback.print_exc()
         # finally:
