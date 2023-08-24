@@ -209,5 +209,5 @@ class NewRunAgentTool(BaseTool):
         finally:
             return {
                 'agent_id': target_agent_id,
-                'agent_execution_id': agent_execution_created.id
+                'agent_execution_id': agent_execution_created.id if agent_execution_created != None else None
             }
