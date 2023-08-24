@@ -19,6 +19,16 @@ from enum import Enum
 class ListAgentInput(BaseModel):
     pass
 
+class ListAgentOutput:
+    organisation: None
+    project: None
+    agents: None
+
+    def __init__(self, organisation, project, agents):
+        self.organisation = organisation
+        self.project = project
+        self.agents = agents
+
 class ListAgentTool(BaseTool):
     """
     List Agent tool
@@ -81,9 +91,6 @@ class ListAgentTool(BaseTool):
         project = session.query(Project).filter(Project.organisation_id == organisation.id).first()
         agents = session.query(Agent).filter(Agent.project_id == project.id).all()
 
-        return json.dumps([ "Hello World!",
-            serialize(toolkit),
-            serialize(organisation),
-            serialize(project),
-            serialize(agents)
-        ], default=json_serial)
+        results = ListAgentOutput(organisation, project, agents)
+
+        return json.dumps(results, default=json_serial)
