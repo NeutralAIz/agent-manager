@@ -200,10 +200,9 @@ class NewRunAgentTool(BaseTool):
 
             # Fetching the last configuration of the target agent
             agent_config = get_agent_execution_configuration(target_agent_id, session)
-            agent_execution_config_json = json.dumps(agent_config, default=json_serial)
 
             # Creating a new execution of the target agent 
-            agent_execution_created = create_agent_execution(json.loads(agent_execution_config_json), session)
+            agent_execution_created = create_agent_execution(agent_config, session)
 
         except:
             traceback.print_exc()
