@@ -1,3 +1,4 @@
+import traceback
 import json
 import ast
 from typing import Any, Type, Optional, Union, List
@@ -193,17 +194,21 @@ class NewRunAgentTool(BaseTool):
         Returns:
             JSON representation of the agent ID
         """
+        try:
 
-        session = self.toolkit_config.session
+            session = self.toolkit_config.session
 
-        # Fetching the last configuration of the target agent
-        agent_config = get_agent_execution_configuration(target_agent_id, session)
-        agent_execution_config_json = json.dumps(agent_config, default=json_serial)
+            # Fetching the last configuration of the target agent
+            agent_config = get_agent_execution_configuration(target_agent_id, session)
+            agent_execution_config_json = json.dumps(agent_config, default=json_serial)
 
-        # Creating a new execution of the target agent 
-        agent_execution_created = create_agent_execution(json.loads(agent_execution_config_json), session)
+            # Creating a new execution of the target agent 
+            agent_execution_created = create_agent_execution(json.loads(agent_execution_config_json), session)
 
-        return {
-            'agent_id': target_agent_id,
-            'agent_execution_id': agent_execution_created.id
-        }
+        except:
+            traceback.print_exc()
+        finally:
+            return {
+                'agent_id': target_agent_id,
+                'agent_execution_id': agent_execution_created.id
+            }
