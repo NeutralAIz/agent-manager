@@ -1,6 +1,7 @@
 import json
 from typing import Type 
 from pydantic import BaseModel#, Field
+from sqlalchemy import inspect
 from superagi.tools.base_tool import BaseTool
 from superagi.models.toolkit import Toolkit
 from superagi.models.agent import Agent
@@ -23,17 +24,20 @@ class ListAgentTool(BaseTool):
     """
     name: str = "List Agent Tool"
     args_schema: Type[ListAgentInput] = ListAgentInput
-    description: str = "Prints all the agent objects as JSON from the default project"
+    description: str = "Prints all the agent objects as JSON from the default project.."
     agent_id: int = None
     agent_execution_id: int = None
-
+            
     def _execute(self):
         """
         Execute the List Agent tool.
         Returns:
             JSON representation of all the agents from default project
-        """  
-
+        """
+    
+        def object_as_dict(obj):
+            return {c.key: getattr(obj, c.key)
+                for c in inspect(obj).mapper.column_attrs}
 
         session = self.toolkit_config.session
 
@@ -42,7 +46,6 @@ class ListAgentTool(BaseTool):
         project = session.query(Project).filter(Project.organisation_id == organisation.id).first()
         agents = session.query(Agent).filter(Agent.project_id == project.id).all()
 
-        # Get all agents for default project
-        agent_list = [agent.__dict__ for agent in agents] 
+        agent_list = [object_as_dict(agent) for agent in agents]
 
         return json.dumps(agent_list)
