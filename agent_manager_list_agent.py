@@ -1,7 +1,8 @@
 import json
 from typing import Type 
-from pydantic import BaseModel#, Field
+from pydantic import Base, BaseModel#, Field
 from sqlalchemy import inspect
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from superagi.tools.base_tool import BaseTool
 from superagi.models.toolkit import Toolkit
 from superagi.models.agent import Agent
@@ -46,8 +47,8 @@ class ListAgentTool(BaseTool):
                 return obj.isoformat()
             elif isinstance(obj, timedelta):
                 return str(obj)
-            elif inspect(obj).is_mapper:  # SQLAlchemy check
-                return {key: serialize(val) for key, val in obj.__dict__.items() if not key.startswith('_')} 
+            elif isinstance(obj, (Base, BaseModel)) or isinstance(type(obj), DeclarativeMeta):  # Handle all SQLAlchemy objects
+                return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
             elif isinstance(obj, UUID):  # Handle UUID objects.
                 return str(obj)
             elif isinstance(obj, decimal.Decimal):  # Handle Decimal objects.
