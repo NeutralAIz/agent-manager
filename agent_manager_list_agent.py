@@ -1,5 +1,6 @@
 import json
-from typing import Type 
+from dataclasses import dataclass
+from typing import Any, Type
 from pydantic import BaseModel#, Field
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -19,18 +20,16 @@ from enum import Enum
 class ListAgentInput(BaseModel):
     pass
 
+@dataclass
 class ListAgentOutput:
-    organisation: None
-    project: None
-    agents: None
+    organisation: Any
+    project: Any
+    agents: Any
 
     def __init__(self, organisation, project, agents):
         self.organisation = organisation
         self.project = project
         self.agents = agents
-
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 class ListAgentTool(BaseTool):
     """
