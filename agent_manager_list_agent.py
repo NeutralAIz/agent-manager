@@ -58,8 +58,8 @@ class ListAgentOutput:
     project: Any
     agents: Any
 
-def to_json(self):
-    return json.dumps(asdict(self), default=json_serial)
+    def to_json(self):
+        return json.dumps(asdict(self), default=json_serial)
 
 class ListAgentTool(BaseTool):
     """
