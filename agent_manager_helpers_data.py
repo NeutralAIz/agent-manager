@@ -167,6 +167,7 @@ def get_agent_execution(agent_execution_id: int, session):
         HTTPException (Status Code=404): If the agent execution is not found.
     """
 
+
     if (
         db_agent_execution := session.query(AgentExecution).filter(AgentExecution.id == agent_execution_id).first()
     ):

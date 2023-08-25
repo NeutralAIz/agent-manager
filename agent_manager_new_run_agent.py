@@ -59,12 +59,12 @@ class NewRunAgentTool(BaseTool):
                 maxWaitTime = 60 * 10 #seconds * minutes
                 currentWaitTime = 0
 
-                while maxWaitTime > currentWaitTime and (execution_result == None or execution_result.status in ['CREATED', 'RUNNING']):
-                    if execution_result != None:
-                        time.sleep(1) 
-                        currentWaitTime += 1
+                execution_result = get_agent_execution(agent_execution_created.id, session)
 
-                    execution_result = get_agent_execution(agent_execution_created.id, session)
+                while maxWaitTime > currentWaitTime and execution_result.status in ['CREATED', 'RUNNING']:
+                    time.sleep(1) 
+                    currentWaitTime += 1
+                    session.refresh(execution_result)
 
                 agent_execution_feed = get_agent_execution_feed(agent_execution_created.id, session)
             
