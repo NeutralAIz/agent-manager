@@ -1,6 +1,8 @@
 from typing import Any, Optional, Union, List
 from datetime import datetime
 from sqlalchemy import func, or_, desc
+from sqlalchemy.sql import asc
+import re
 
 from pydantic import BaseModel
 
@@ -11,6 +13,11 @@ from superagi.models.agent_execution_config import AgentExecutionConfiguration
 from superagi.models.workflows.agent_workflow import AgentWorkflow
 from superagi.models.workflows.iteration_workflow import IterationWorkflow
 from superagi.worker import execute_agent
+from superagi.models.agent_execution_permission import AgentExecutionPermission
+from superagi.helper.feed_parser import parse_feed
+from superagi.models.agent_execution import AgentExecution
+from superagi.models.agent_execution_feed import AgentExecutionFeed
+from superagi.helper.time_helper import get_time_difference
 
 
 def get_agent_execution_configuration(agent_id: Union[int, None, str], session):
@@ -145,3 +152,69 @@ def create_agent_execution(agent_id: int, agent_config_in: AgentExecutionIn, ses
         execute_agent.delay(db_agent_execution.id, datetime.now())
 
     return db_agent_execution
+
+def get_agent_execution(agent_execution_id: int, session):
+    """
+    Get an agent execution by agent_execution_id.
+
+    Args:
+        agent_execution_id (int): The ID of the agent execution.
+
+    Returns:
+        AgentExecution: The requested agent execution.
+
+    Raises:
+        HTTPException (Status Code=404): If the agent execution is not found.
+    """
+
+    if (
+        db_agent_execution := session.query(AgentExecution).filter(AgentExecution.id == agent_execution_id).first()
+    ):
+        return db_agent_execution
+    else:
+        raise Exception()
+    
+def get_agent_execution_feed(agent_execution_id: int, session):
+    """
+    Get agent execution feed with other execution details.
+
+    Args:
+        agent_execution_id (int): The ID of the agent execution.
+
+    Returns:
+        dict: The agent execution status and feeds.
+
+    Raises:
+        HTTPException (Status Code=400): If the agent run is not found.
+    """
+
+    agent_execution = session.query(AgentExecution).filter(AgentExecution.id == agent_execution_id).first()
+    if agent_execution is None:
+        raise Exception()
+    feeds = session.query(AgentExecutionFeed).filter_by(agent_execution_id=agent_execution_id).order_by(asc(AgentExecutionFeed.created_at)).all()
+    # # parse json
+    final_feeds = []
+    for feed in feeds:
+        if feed.feed != "" and re.search(r"The current time and date is\s(\w{3}\s\w{3}\s\s?\d{1,2}\s\d{2}:\d{2}:\d{2}\s\d{4})",feed.feed) == None :
+            final_feeds.append(parse_feed(feed))
+
+    # get all permissions
+    execution_permissions = session.query(AgentExecutionPermission).filter_by(agent_execution_id=agent_execution_id).order_by(asc(AgentExecutionPermission.created_at)).all()
+
+    permissions = [
+        {
+                "id": permission.id,
+                "created_at": permission.created_at,
+                "response": permission.user_feedback,
+                "status": permission.status,
+                "tool_name": permission.tool_name,
+                "question": permission.question,
+                "user_feedback": permission.user_feedback,
+                "time_difference":get_time_difference(permission.created_at,str(datetime.now()))
+        } for permission in execution_permissions
+    ]
+    return {
+        "status": agent_execution.status,
+        "feeds": final_feeds,
+        "permissions": permissions
+    }
