@@ -56,7 +56,7 @@ class NewRunAgentTool(BaseTool):
             agent_execution_created = create_agent_execution(target_agent_id, agent_config, session)
 
             if wait_for_result:
-                maxWaitTime = 60 * 5 #seconds * minutes
+                maxWaitTime = 60 * 10 #seconds * minutes
                 currentWaitTime = 0
 
                 while maxWaitTime > currentWaitTime and (execution_result == None or execution_result.status in ['CREATED', 'RUNNING']):
