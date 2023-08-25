@@ -56,7 +56,7 @@ class NewRunAgentTool(BaseTool):
                 maxWaitTime = 60 * 5 #seconds * minutes
                 currentWaitTime = 0
 
-                while maxWaitTime > currentWaitTime and agent_execution.status == None or agent_execution.status in ['CREATED', 'RUNNING']:
+                while maxWaitTime > currentWaitTime and (agent_execution == None or agent_execution.status in ['CREATED', 'RUNNING']):
                     if agent_execution != None:
                         time.sleep(1) 
                         currentWaitTime += 1
