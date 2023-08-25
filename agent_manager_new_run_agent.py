@@ -2,14 +2,20 @@ import traceback
 import time
 from typing import Any, Type
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
 from agent_manager_helpers_data import get_agent_execution_configuration, create_agent_execution, get_agent_execution, get_agent_execution_feed
 
 
 class NewRunAgentInput(BaseModel):
-    target_agent_id: int
-    wait_for_result: bool
+    target_agent_id: int = Field(
+        ...,
+        description="The agent id to create a run for.",
+    )
+    wait_for_result: bool = Field(
+        ...,
+        description="Should the tool wait for the agent to finish and return the results.",
+    )
 
 class NewRunAgentTool(BaseTool):
     """
@@ -31,7 +37,7 @@ class NewRunAgentTool(BaseTool):
     target_agent_id: int = None
     wait_for_result: bool = True
             
-    def _execute(self, target_agent_id: int, wait_for_result: bool):
+    def _execute(self, target_agent_id: int, wait_for_result: bool = True):
         """
         Execute the Save Scheduled Agent Tool.
         Returns:
