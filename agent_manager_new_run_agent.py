@@ -66,7 +66,7 @@ class NewRunAgentTool(BaseTool):
 
                     execution_result = get_agent_execution(agent_execution_created.id, session)
 
-                agent_execution_feed = get_agent_execution_feed(execution_result, session)
+                agent_execution_feed = get_agent_execution_feed(agent_execution_created.id, session)
             
 
         except:
