@@ -64,7 +64,7 @@ class NewRunAgentTool(BaseTool):
                         time.sleep(1) 
                         currentWaitTime += 1
 
-                    execution_result = get_agent_execution(target_agent_id, session)
+                    execution_result = get_agent_execution(agent_execution_created.id, session)
 
                 agent_execution_feed = get_agent_execution_feed(execution_result, session)
             
