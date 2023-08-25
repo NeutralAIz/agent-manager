@@ -43,8 +43,10 @@ class NewRunAgentTool(BaseTool):
         Returns:
             JSON representation of the agent ID
         """
-        try:
+        execution_result = None
+        agent_execution_feed = None
 
+        try:
             session = self.toolkit_config.session
 
             # Fetching the last configuration of the target agent
@@ -53,23 +55,18 @@ class NewRunAgentTool(BaseTool):
             # Creating a new execution of the target agent 
             agent_execution_created = create_agent_execution(target_agent_id, agent_config, session)
 
-            execution_result = None
-            agent_execution_feed = None
-
             if wait_for_result:
-                agent_execution = None
-
                 maxWaitTime = 60 * 5 #seconds * minutes
                 currentWaitTime = 0
 
-                while maxWaitTime > currentWaitTime and (agent_execution == None or agent_execution.status in ['CREATED', 'RUNNING']):
-                    if agent_execution != None:
+                while maxWaitTime > currentWaitTime and (execution_result == None or execution_result.status in ['CREATED', 'RUNNING']):
+                    if execution_result != None:
                         time.sleep(1) 
                         currentWaitTime += 1
 
-                    agent_execution = get_agent_execution(target_agent_id, session)
+                    execution_result = get_agent_execution(target_agent_id, session)
 
-                agent_execution_feed = get_agent_execution_feed(agent_execution, session)
+                agent_execution_feed = get_agent_execution_feed(execution_result, session)
             
 
         except:
