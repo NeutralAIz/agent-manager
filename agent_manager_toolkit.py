@@ -16,7 +16,7 @@ class AgentManagerToolkit(BaseToolkit, ABC):
         dynamicAgents = []
         try:
             targetDynamicAgentToolkit = DynamicAgentTool()
-            dynamicAgents = targetDynamicAgentToolkit.create_from_agents(targetDynamicAgentToolkit, self.name)
+            dynamicAgents = targetDynamicAgentToolkit.create_from_agents(self.name)
 
             return [
                 ListAgentTool(), CurrentAgentTool(), NewRunAgentTool(), DynamicAgentTool()
