@@ -33,12 +33,17 @@ class DynamicAgentTool(BaseTool):
             self.description = agent.description
             self.agent_id = agent.id
             class_name = self.__class__.__name__
+            filename = "agent_manager_toolkit.py"
+            foldername = "agent-manager"
             toolkit = get_toolkit_by_name(session, toolkit_name)
 
-            Tool.add_or_update(session, self.name, self.description, "agent-manager", class_name, "agent_manager_dynamic_agent.py", toolkit.id)
+            tool =  Tool.add_or_update(session, self.name, self.description, foldername, class_name, filename, toolkit.id)
+            logger.info(f"Tool created {tool}")
 
         except:
-            traceback.print_exc()
+            logger.error(traceback.print_exc())
+        finally:
+            return tool
 
 
 

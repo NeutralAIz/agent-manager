@@ -23,7 +23,6 @@ class AgentManagerToolkit(BaseToolkit, ABC):
             targetDynamicAgentToolkit = DynamicAgentTool()
             self.dynamicAgents = targetDynamicAgentToolkit.create_from_agents(self.name)
 
-
             logger.info(f"Initilizing dynamic agent tools. : {self}!")
         except:
             traceback.print_exc()
