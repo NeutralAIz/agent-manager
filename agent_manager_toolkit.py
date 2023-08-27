@@ -13,7 +13,7 @@ class AgentManagerToolkit(BaseToolkit, ABC):
     def get_tools(self) -> List[BaseTool]:
         return [
             ListAgentTool(), CurrentAgentTool(), NewRunAgentTool()
-        ] + DynamicAgentToolkit.create_from_agents(self)
+        ] + DynamicAgentToolkit.create_from_agents()
 
     def get_env_keys(self) -> List[str]:
         return []
