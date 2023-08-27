@@ -34,7 +34,7 @@ class ListAgentTool(BaseTool):
         """
 
         try:
-            agents = get_agents(self.toolkit_config.session)
+            agents = get_agents(self.toolkit_config.session, self.toolkit_config)
         except:
             traceback.print_exc()
 
