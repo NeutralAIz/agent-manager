@@ -5,6 +5,7 @@ from typing import Any, Type
 from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
 from agent_manager_helpers_data import get_agent_execution_configuration, create_agent_execution, get_agent_execution, get_agent_execution_feed
+from agent_manager_helpers_resources import ResourceManager
 
 
 class NewRunAgentInput(BaseModel):
@@ -14,7 +15,7 @@ class NewRunAgentInput(BaseModel):
     )
     wait_for_result: bool = Field(
         ...,
-        description="Should the tool wait for the agent to finish and return the results.",
+        description="(Recommended) Wait for the agent to finish and return the results.",
     )
 
 class NewRunAgentTool(BaseTool):
@@ -45,6 +46,7 @@ class NewRunAgentTool(BaseTool):
         """
         execution_result = None
         agent_execution_feed = None
+        resources = None
 
         try:
             session = self.toolkit_config.session
@@ -67,6 +69,9 @@ class NewRunAgentTool(BaseTool):
                     session.refresh(execution_result)
 
                 agent_execution_feed = get_agent_execution_feed(agent_execution_created.id, session)
+
+                resource_manager_obj = ResourceManager(target_agent_id, session)
+                resources = resource_manager_obj.get_all_resources(execution_result.id)
             
 
         except:
@@ -77,8 +82,5 @@ class NewRunAgentTool(BaseTool):
                 'agent_execution_id': agent_execution_created.id if agent_execution_created != None else None,
                 'execution': execution_result,
                 'feed': agent_execution_feed,
-                'resources': {
-                    'input': [],
-                    'output': []
-                }
+                'resources': resources
             }
