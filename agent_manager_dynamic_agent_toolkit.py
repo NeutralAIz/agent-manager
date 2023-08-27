@@ -34,11 +34,11 @@ class DynamicAgentToolkit(BaseTool):
         dynamic_agent_toolkits = []
         self = BaseTool()
         try:
-            agents = get_agents()
+            agents = get_agents(self)
 
             for agent in agents.agents:
                 DynamicAgentToolkitClass = type(f'DynamicAgentToolkit{agent.id}', (DynamicAgentToolkit,), {'agent_id': agent.id})
-                dynamic_agent_toolkit = DynamicAgentToolkitClass(agent)
+                dynamic_agent_toolkit = DynamicAgentToolkitClass(BaseTool, agent)
                 dynamic_agent_toolkits.append(dynamic_agent_toolkit)
 
         except:
