@@ -40,7 +40,7 @@ class DynamicAgentTool(BaseTool):
     def create_from_agents(self, toolkitName):
         dynamic_agent_toolkits = []
         try:
-            agents = get_agents(self.toolkit_config.session)
+            agents = get_agents(self.toolkit_config, self.toolkit_config.session)
 
             for agent in agents.agents:
                 DynamicAgentToolkitClass = type(f'DynamicAgent{agent.id}', (DynamicAgentTool,), {'agent_id': agent.id})
