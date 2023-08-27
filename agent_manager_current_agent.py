@@ -1,7 +1,7 @@
 import json
  
 from typing import Type 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from superagi.tools.base_tool import BaseTool
 from superagi.models.agent import Agent
