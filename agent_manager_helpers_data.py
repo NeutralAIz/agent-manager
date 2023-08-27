@@ -1,8 +1,13 @@
 from typing import Any, Optional, Union, List
 from datetime import datetime
+from time import time
 from sqlalchemy import func, or_, desc
 from sqlalchemy.sql import asc
+from agent_manager_helpers import json_serial
+from dataclasses import dataclass, asdict
 import re
+import json
+import traceback
 
 from pydantic import BaseModel
 
@@ -17,7 +22,31 @@ from superagi.models.agent_execution_permission import AgentExecutionPermission
 from superagi.helper.feed_parser import parse_feed
 from superagi.models.agent_execution import AgentExecution
 from superagi.models.agent_execution_feed import AgentExecutionFeed
+from superagi.models.toolkit import Toolkit
+from superagi.models.agent import Agent
+from superagi.models.project import Project
+from superagi.models.organisation import Organisation
+from agent_manager_helpers_resources import ResourceManager
 from superagi.helper.time_helper import get_time_difference
+
+@dataclass
+class ListAgentOutput:
+    organisation: Any
+    project: Any
+    agents: Any
+
+    def to_json(self):
+        return json.dumps(asdict(self), default=json_serial)
+    
+def get_agents(self):
+    session = self.toolkit_config.session
+
+    toolkit = session.query(Toolkit).filter(Toolkit.id == self.toolkit_config.toolkit_id).first()
+    organisation = session.query(Organisation).filter(Organisation.id == toolkit.organisation_id).first()
+    project = session.query(Project).filter(Project.organisation_id == organisation.id).first()
+    agents = session.query(Agent).filter(Agent.project_id == project.id).all()
+
+    return ListAgentOutput(organisation, project, agents)
 
 
 def get_agent_execution_configuration(agent_id: Union[int, None, str], session):
@@ -219,3 +248,47 @@ def get_agent_execution_feed(agent_execution_id: int, session):
         "feeds": final_feeds,
         "permissions": permissions
     }
+
+def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_result: bool = True):
+    """
+    Execute the Save Scheduled Agent Tool.
+    Returns:
+        JSON representation of the agent ID
+    """
+    execution_result = None
+    agent_execution_feed = None
+    resources = None
+
+    try:
+        # Fetching the last configuration of the target agent
+        agent_config = get_agent_execution_configuration(target_agent_id, session)
+        
+        # Creating a new execution of the target agent 
+        agent_execution_created = create_agent_execution(target_agent_id, agent_config, session)
+
+        if wait_for_result:
+            maxWaitTime = 60 * 10 #seconds * minutes
+            currentWaitTime = 0
+
+            execution_result = get_agent_execution(agent_execution_created.id, session)
+
+            while maxWaitTime > currentWaitTime and execution_result.status in ['CREATED', 'RUNNING']:
+                time.sleep(1) 
+                currentWaitTime += 1
+                session.refresh(execution_result)
+
+            agent_execution_feed = get_agent_execution_feed(agent_execution_created.id, session)
+
+            resource_manager_obj = ResourceManager(target_agent_id, session)
+            resources = resource_manager_obj.get_all_resources(execution_result.id)
+
+    except Exception as e:
+        print(f"Error occurred while executing save scheduled agent tool: {e}" + traceback.print_exc()) 
+    finally:
+        return {
+            'agent_id': target_agent_id,
+            'agent_execution_id': agent_execution_created.id if agent_execution_created != None else None,
+            'execution': execution_result,
+            'feed': agent_execution_feed,
+            'resources': resources
+        }

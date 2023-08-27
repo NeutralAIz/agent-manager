@@ -1,11 +1,10 @@
 import traceback
-import time
 from typing import Any, Type
 
 from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
-from agent_manager_helpers_data import get_agent_execution_configuration, create_agent_execution, get_agent_execution, get_agent_execution_feed
-from agent_manager_helpers_resources import ResourceManager
+from agent_manager_helpers_data import execute_save_scheduled_agent_tool
+
 
 
 class NewRunAgentInput(BaseModel):
@@ -44,43 +43,5 @@ class NewRunAgentTool(BaseTool):
         Returns:
             JSON representation of the agent ID
         """
-        execution_result = None
-        agent_execution_feed = None
-        resources = None
-
-        try:
-            session = self.toolkit_config.session
-
-            # Fetching the last configuration of the target agent
-            agent_config = get_agent_execution_configuration(target_agent_id, session)
-            
-            # Creating a new execution of the target agent 
-            agent_execution_created = create_agent_execution(target_agent_id, agent_config, session)
-
-            if wait_for_result:
-                maxWaitTime = 60 * 10 #seconds * minutes
-                currentWaitTime = 0
-
-                execution_result = get_agent_execution(agent_execution_created.id, session)
-
-                while maxWaitTime > currentWaitTime and execution_result.status in ['CREATED', 'RUNNING']:
-                    time.sleep(1) 
-                    currentWaitTime += 1
-                    session.refresh(execution_result)
-
-                agent_execution_feed = get_agent_execution_feed(agent_execution_created.id, session)
-
-                resource_manager_obj = ResourceManager(target_agent_id, session)
-                resources = resource_manager_obj.get_all_resources(execution_result.id)
-            
-
-        except:
-            traceback.print_exc()
-        finally:
-            return {
-                'agent_id': target_agent_id,
-                'agent_execution_id': agent_execution_created.id if agent_execution_created != None else None,
-                'execution': execution_result,
-                'feed': agent_execution_feed,
-                'resources': resources
-            }
+        return execute_save_scheduled_agent_tool(self.toolkit_config.session, target_agent_id, wait_for_result)
+    
