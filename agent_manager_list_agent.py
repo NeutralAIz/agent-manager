@@ -3,6 +3,7 @@ import traceback
 from typing import Type
 from pydantic import BaseModel
 from superagi.tools.base_tool import BaseTool
+from agent_manager_helpers_data import get_agents
 
 
 class ListAgentInput(BaseModel):
@@ -33,7 +34,7 @@ class ListAgentTool(BaseTool):
         """
 
         try:
-            agents = self.get_agents()
+            agents = get_agents(self.toolkit_config.session)
         except:
             traceback.print_exc()
 

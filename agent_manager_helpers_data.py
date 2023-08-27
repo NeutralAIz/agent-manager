@@ -38,9 +38,7 @@ class ListAgentOutput:
     def to_json(self):
         return json.dumps(asdict(self), default=json_serial)
     
-def get_agents(self):
-    session = self.toolkit_config.session
-
+def get_agents(session):
     toolkit = session.query(Toolkit).filter(Toolkit.id == self.toolkit_config.toolkit_id).first()
     organisation = session.query(Organisation).filter(Organisation.id == toolkit.organisation_id).first()
     project = session.query(Project).filter(Project.organisation_id == organisation.id).first()
