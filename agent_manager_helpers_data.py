@@ -38,8 +38,8 @@ class ListAgentOutput:
     def to_json(self):
         return json.dumps(asdict(self), default=json_serial)
     
-def get_agents(session, toolkit_config):
-    toolkit = get_toolkit(session, toolkit_config.toolkit_id)
+def get_agents(session, toolkit_id):
+    toolkit = get_toolkit(session, toolkit_id)
     organisation = get_organisation(session, toolkit.organisation_id)
     project = get_project_by_organisation_id(session, toolkit.organisation_id)
     agents = get_agents_by_project_id(session, toolkit.organisation_id)
@@ -60,10 +60,8 @@ def get_agents_by_project_id(session, project_id):
     return session.query(Agent).filter(Agent.project_id == project_id).all()
 
 def get_toolkit_by_name(session, toolkit_name):
-        toolkit = session.query(Toolkit).filter_by(name=toolkit_name).first()
-        if toolkit:
-            return toolkit
-        return None
+    toolkit = session.query(Toolkit).filter_by(name=toolkit_name).first()
+    return toolkit
 
 
 def get_agent_execution_configuration(agent_id: Union[int, None, str], session):
