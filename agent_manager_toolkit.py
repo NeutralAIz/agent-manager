@@ -11,22 +11,25 @@ class AgentManagerToolkit(BaseToolkit, ABC):
     id: int = -1
     name: str = "Agent Manager Toolkit"
     description: str = "Tools to view and interact with other SuperAGI agents in the same instance."
+    dynamicAgents = []
 
-    def get_tools(self) -> List[BaseTool]:
-        dynamicAgents = []
+
+    def __init__(self):
+        super().__init__()
         try:
             targetDynamicAgentToolkit = DynamicAgentTool()
-            dynamicAgents = targetDynamicAgentToolkit.create_from_agents(self.name)
+            self.dynamicAgents = targetDynamicAgentToolkit.create_from_agents(self.name)
+        except:
+            traceback.print_exc()
 
-            return [
-                ListAgentTool(), CurrentAgentTool(), NewRunAgentTool(), DynamicAgentTool()
-            ] + dynamicAgents
+    def get_tools(self) -> List[BaseTool]:
+        tools = [ListAgentTool(), CurrentAgentTool(), NewRunAgentTool(), DynamicAgentTool()]
+        try:
+            tools.extend(self.dynamicAgents)
         except:
             traceback.print_exc()
         finally:
-            return [
-                ListAgentTool(), CurrentAgentTool(), NewRunAgentTool()
-            ]
+            return tools
 
     def get_env_keys(self) -> List[str]:
         return []

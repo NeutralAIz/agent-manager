@@ -26,31 +26,35 @@ class DynamicAgentTool(BaseTool):
     def _execute(self):
         return execute_save_scheduled_agent_tool(self.toolkit_config.session, self.agent_id)
 
-    def build(self, agent, toolkit_name):
-        session = self.toolkit_config.session
-        self.name = agent.name
-        self.description = agent.description
-        self.agent_id = agent.id
-        class_name = self.__class__.__name__
-        toolkit = get_toolkit_by_name(session, toolkit_name)
+    def build(self, session, agent, toolkit_name):
+        try:
+            self.name = agent.name
+            self.description = agent.description
+            self.agent_id = agent.id
+            class_name = self.__class__.__name__
+            toolkit = get_toolkit_by_name(session, toolkit_name)
 
-        Tool.add_or_update(session, self.name, self.description, "agent-manager", class_name, "agent_manager_dynamic_agent.py", toolkit.id)
+            Tool.add_or_update(session, self.name, self.description, "agent-manager", class_name, "agent_manager_dynamic_agent.py", toolkit.id)
+
+        except:
+            traceback.print_exc()
 
 
 
     def create_from_agents(self, toolkit_name):
-        engine = connect_db()
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        self.toolkit_config.session = session
         dynamic_agent_toolkits = []
+
         try:
+            engine = connect_db()
+            Session = sessionmaker(bind=engine)
+            session = Session()
+            self.toolkit_config.session = session
             toolkit = get_toolkit_by_name(session, toolkit_name)
             agents = get_agents(session, toolkit.id)
 
             for agent in agents.agents:
                 DynamicAgentToolkitClass = type(f'DynamicAgent{agent.id}', (DynamicAgentTool,), {'agent_id': agent.id})
-                dynamic_agent_toolkit = DynamicAgentToolkitClass().build(agent, toolkit_name)
+                dynamic_agent_toolkit = DynamicAgentToolkitClass().build(session, agent, toolkit_name)
                 dynamic_agent_toolkits.append(dynamic_agent_toolkit)
 
         except:
