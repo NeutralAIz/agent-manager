@@ -6,6 +6,7 @@ from agent_manager_list_agent import ListAgentTool
 from agent_manager_current_agent import CurrentAgentTool
 from agent_manager_new_run_agent import NewRunAgentTool
 from agent_manager_dynamic_agent import DynamicAgentTool
+from superagi.lib.logger import logger
 
 class AgentManagerToolkit(BaseToolkit, ABC):
     id: int = -1
@@ -21,6 +22,9 @@ class AgentManagerToolkit(BaseToolkit, ABC):
             self.description = "Tools to view and interact with other SuperAGI agents in the same instance."
             targetDynamicAgentToolkit = DynamicAgentTool()
             self.dynamicAgents = targetDynamicAgentToolkit.create_from_agents(self.name)
+
+
+            logger.info(f"Initilizing dynamic agent tools. : {self}!")
         except:
             traceback.print_exc()
 

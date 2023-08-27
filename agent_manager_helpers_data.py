@@ -31,6 +31,7 @@ from superagi.helper.time_helper import get_time_difference
 
 @dataclass
 class ListAgentOutput:
+    toolkit: Any
     organisation: Any
     project: Any
     agents: Any
@@ -42,9 +43,9 @@ def get_agents(session, toolkit_id):
     toolkit = get_toolkit(session, toolkit_id)
     organisation = get_organisation(session, toolkit.organisation_id)
     project = get_project_by_organisation_id(session, toolkit.organisation_id)
-    agents = get_agents_by_project_id(session, toolkit.organisation_id)
+    agents = get_agents_by_project_id(session, project.id)
 
-    return ListAgentOutput(organisation, project, agents)
+    return ListAgentOutput(toolkit, organisation, project, agents)
 
 
 def get_toolkit(session, toolkit_id):

@@ -8,6 +8,7 @@ import traceback
 from agent_manager_helpers_data import get_agents, execute_save_scheduled_agent_tool, get_toolkit_by_name
 from sqlalchemy.orm import sessionmaker
 from superagi.models.db import connect_db
+from superagi.lib.logger import logger
 
 class DynamicAgentToolInput(BaseModel):
     wait_for_result: bool = Field(
@@ -48,9 +49,14 @@ class DynamicAgentTool(BaseTool):
             engine = connect_db()
             Session = sessionmaker(bind=engine)
             session = Session()
-            self.toolkit_config.session = session
+
             toolkit = get_toolkit_by_name(session, toolkit_name)
+
+            logger.info(f"Toolkit info: {toolkit}")
+
             agents = get_agents(session, toolkit.id)
+
+            logger.info(f"Agents found: {agents}")
 
             for agent in agents.agents:
                 DynamicAgentToolkitClass = type(f'DynamicAgent{agent.id}', (DynamicAgentTool,), {'agent_id': agent.id})
@@ -58,7 +64,7 @@ class DynamicAgentTool(BaseTool):
                 dynamic_agent_toolkits.append(dynamic_agent_toolkit)
 
         except:
-            traceback.print_exc()
+            logger.error(traceback.print_exc())
         finally:
             return dynamic_agent_toolkits
         
