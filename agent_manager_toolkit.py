@@ -17,6 +17,8 @@ class AgentManagerToolkit(BaseToolkit, ABC):
     def __init__(self):
         super().__init__()
         try:
+            self.name = "Agent Manager Toolkit"
+            self.description = "Tools to view and interact with other SuperAGI agents in the same instance."
             targetDynamicAgentToolkit = DynamicAgentTool()
             self.dynamicAgents = targetDynamicAgentToolkit.create_from_agents(self.name)
         except:
