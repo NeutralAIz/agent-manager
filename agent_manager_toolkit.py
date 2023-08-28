@@ -8,15 +8,12 @@ from agent_manager_new_run_agent import NewRunAgentTool
 from agent_manager_dynamic_agent import DynamicAgentTool
 from superagi.lib.logger import logger
 
-import sys
-import types
-
 class AgentManagerToolkit(BaseToolkit, ABC):
     name: str = "Agent Manager Toolkit"
     description: str = "Tools to view and interact with other SuperAGI agents in the same instance."
     dynamicAgentsOnLoad: List[BaseTool] = List[BaseTool]
 
-    def __init__(self, class_name: str = None):
+    def __init__(self):
         super().__init__()        
         try:            
             self.name = "Agent Manager Toolkit"
@@ -28,15 +25,19 @@ class AgentManagerToolkit(BaseToolkit, ABC):
             logger.info(f"Initilizing dynamic agent tools. : {self.dynamicAgentsOnLoad}!")
             
             for dynamicAgent in self.dynamicAgentsOnLoad:
-                if class_name == dynamicAgent.class_name:
-                    logger.error(f"Executing : {class_name}")
-                    return dynamicAgent
                 globals()[dynamicAgent.class_name] = dynamicAgent
                 locals()[dynamicAgent.class_name] = dynamicAgent
                 logger.info(f"Setting up local/global tool : {dynamicAgent}!")
 
         except:
             traceback.print_exc()
+
+    def get_dynamic_agent_tool(self, class_name):
+        for dynamicAgent in self.dynamicAgentsOnLoad:
+            if class_name == dynamicAgent.class_name:
+                logger.error(f"Executing : {class_name}")
+                return dynamicAgent
+
         
     def get_tools(self) -> List[BaseTool]:
         tools = [
