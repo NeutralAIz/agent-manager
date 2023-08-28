@@ -16,7 +16,7 @@ class AgentManagerToolkit(BaseToolkit, ABC):
     description: str = "Tools to view and interact with other SuperAGI agents in the same instance."
     dynamicAgentsOnLoad: List[BaseTool] = List[BaseTool]
 
-    def __init__(self):
+    def __init__(self, class_name):
         super().__init__()        
         try:            
             self.name = "Agent Manager Toolkit"
@@ -28,6 +28,10 @@ class AgentManagerToolkit(BaseToolkit, ABC):
             logger.info(f"Initilizing dynamic agent tools. : {self.dynamicAgentsOnLoad}!")
             
             for dynamicAgent in self.dynamicAgentsOnLoad:
+                if class_name == dynamicAgent.class_name:
+                    logger.error(f"Executing : {class_name}")
+                    dynamicAgent._execute()
+                    return
                 globals()[dynamicAgent.class_name] = dynamicAgent
                 locals()[dynamicAgent.class_name] = dynamicAgent
                 logger.info(f"Setting up local/global tool : {dynamicAgent}!")
