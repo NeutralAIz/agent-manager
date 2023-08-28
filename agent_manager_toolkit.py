@@ -8,29 +8,39 @@ from agent_manager_new_run_agent import NewRunAgentTool
 from agent_manager_dynamic_agent import DynamicAgentTool
 from superagi.lib.logger import logger
 
+import sys
+import types
+
 class AgentManagerToolkit(BaseToolkit, ABC):
-    id: int = -1
     name: str = "Agent Manager Toolkit"
     description: str = "Tools to view and interact with other SuperAGI agents in the same instance."
-    dynamicAgents = []
-
+    dynamicAgentsOnLoad: List[BaseTool] = List[BaseTool]
 
     def __init__(self):
-        super().__init__()
-        try:
+        super().__init__()        
+        try:            
             self.name = "Agent Manager Toolkit"
-            self.description = "Tools to view and interact with other SuperAGI agents in the same instance."
-            targetDynamicAgentToolkit = DynamicAgentTool()
-            self.dynamicAgents = targetDynamicAgentToolkit.create_from_agents(self.name)
+            logger.info(f"pluginName : {self.name}")
 
-            logger.info(f"Initilizing dynamic agent tools. : {self}!")
+            targetDynamicAgentToolkit = DynamicAgentTool()
+            self.dynamicAgentsOnLoad = targetDynamicAgentToolkit.create_from_agents(self.name)
+            
+            logger.info(f"Initilizing dynamic agent tools. : {self.dynamicAgentsOnLoad}!")
+            
+            for dynamicAgent in self.dynamicAgentsOnLoad:
+                globals()[dynamicAgent.class_name] = dynamicAgent
+                locals()[dynamicAgent.class_name] = dynamicAgent
+                logger.info(f"Setting up local/global tool : {dynamicAgent}!")
+
         except:
             traceback.print_exc()
-
+        
     def get_tools(self) -> List[BaseTool]:
-        tools = [ListAgentTool(), CurrentAgentTool(), NewRunAgentTool(), DynamicAgentTool()]
+        tools = [
+            ListAgentTool(), CurrentAgentTool(), NewRunAgentTool(), DynamicAgentTool()
+        ]
         try:
-            tools.extend(self.dynamicAgents)
+            tools.extend(self.dynamicAgentsOnLoad)
         except:
             traceback.print_exc()
         finally:

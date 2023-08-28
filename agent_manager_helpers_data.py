@@ -26,6 +26,7 @@ from superagi.models.toolkit import Toolkit
 from superagi.models.agent import Agent
 from superagi.models.project import Project
 from superagi.models.organisation import Organisation
+from superagi.models.tool import Tool
 from agent_manager_helpers_resources import ResourceManager
 from superagi.helper.time_helper import get_time_difference
 
@@ -64,6 +65,25 @@ def get_toolkit_by_name(session, toolkit_name):
     toolkit = session.query(Toolkit).filter_by(name=toolkit_name).first()
     return toolkit
 
+
+def add_or_update(session, tool_name: str, description: str, folder_name: str, class_name: str, file_name: str, toolkit_id: int):
+    # Check if a record with the given tool name already exists inside a toolkit
+    tool = session.query(Tool).filter_by(name=tool_name, toolkit_id=toolkit_id).first()
+    
+    if tool is not None:
+        # Update the attributes of the existing tool record
+        tool.folder_name = folder_name if bool(folder_name) else tool.folder_name
+        tool.class_name = class_name if bool(class_name) else tool.class_name
+        tool.file_name = file_name if bool(file_name) else tool.file_name
+        tool.description = description if bool(description) else tool.description
+    else:
+        # Create a new tool record
+        tool = Tool(name=tool_name, description=description, folder_name=folder_name, class_name=class_name, file_name=file_name, toolkit_id=toolkit_id)
+        session.add(tool)
+
+    session.commit()
+    session.flush()
+    return tool
 
 def get_agent_execution_configuration(agent_id: Union[int, None, str], session):
     """
