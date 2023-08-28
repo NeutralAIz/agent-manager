@@ -30,8 +30,7 @@ class AgentManagerToolkit(BaseToolkit, ABC):
             for dynamicAgent in self.dynamicAgentsOnLoad:
                 if class_name == dynamicAgent.class_name:
                     logger.error(f"Executing : {class_name}")
-                    dynamicAgent._execute()
-                    return
+                    return dynamicAgent
                 globals()[dynamicAgent.class_name] = dynamicAgent
                 locals()[dynamicAgent.class_name] = dynamicAgent
                 logger.info(f"Setting up local/global tool : {dynamicAgent}!")
