@@ -61,6 +61,9 @@ def get_project_by_organisation_id(session, organisation_id):
 def get_agents_by_project_id(session, project_id):
     return session.query(Agent).filter(Agent.project_id == project_id).all()
 
+def get_agent(session, agent_id):
+    return session.query(Agent).filter(Agent.id == agent_id).all()
+
 def get_toolkit_by_name(session, toolkit_name):
     toolkit = session.query(Toolkit).filter_by(name=toolkit_name).first()
     return toolkit
