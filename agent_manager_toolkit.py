@@ -16,7 +16,7 @@ class AgentManagerToolkit(BaseToolkit, ABC):
     description: str = "Tools to view and interact with other SuperAGI agents in the same instance."
     dynamicAgentsOnLoad: List[BaseTool] = List[BaseTool]
 
-    def __init__(self, class_name):
+    def __init__(self, class_name: str = None):
         super().__init__()        
         try:            
             self.name = "Agent Manager Toolkit"
