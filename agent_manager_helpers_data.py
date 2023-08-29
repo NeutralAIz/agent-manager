@@ -68,6 +68,10 @@ def get_toolkit_by_name(session, toolkit_name):
     toolkit = session.query(Toolkit).filter_by(name=toolkit_name).first()
     return toolkit
 
+def get_tool_by_class_name(session, source_class_name):
+    tool = session.query(Tool).filter_by(class_name=source_class_name).first()
+    return tool
+
 
 def add_or_update(session, tool_name: str, description: str, folder_name: str, class_name: str, file_name: str, toolkit_id: int):
     # Check if a record with the given tool name already exists inside a toolkit
