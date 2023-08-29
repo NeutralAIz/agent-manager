@@ -301,6 +301,7 @@ def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_re
     execution_result = None
     agent_execution_feed = None
     resources = None
+    waitedResult = "Never Waited"
 
     try:
         # Fetching the last configuration of the target agent
@@ -310,15 +311,24 @@ def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_re
         agent_execution_created = create_agent_execution(target_agent_id, agent_config, session)
 
         if wait_for_result:
+            waitedResult = "Attempting Wait"
             maxWaitTime = 60 * 10 #seconds * minutes
             currentWaitTime = 0
 
             execution_result = get_agent_execution(agent_execution_created.id, session)
 
             while maxWaitTime > currentWaitTime and execution_result.status in ['CREATED', 'RUNNING']:
+                waitedResult = "Waiting"
                 time.sleep(1) 
                 currentWaitTime += 1
                 session.refresh(execution_result)
+
+            if execution_result.status in ['CREATED', 'RUNNING']:
+                waitedResult = "Timeout ({maxWaitTime} seconds)"
+            elif execution_result.status in ['COMPLETED']:
+                waitedResult = "Success"
+            else:
+                waitedResult = "Unknown"
 
             agent_execution_feed = get_agent_execution_feed(agent_execution_created.id, session)
 
@@ -327,10 +337,12 @@ def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_re
 
     except Exception as e:
         print(f"Error occurred while executing save scheduled agent tool: {e}" + traceback.print_exc()) 
+        waitedResult = "Errored"
     finally:
         return {
             'agent_id': target_agent_id,
             'agent_execution_id': agent_execution_created.id if agent_execution_created != None else None,
+            'wait_state': waitedResult,
             'execution': execution_result,
             'feed': agent_execution_feed,
             'resources': resources
