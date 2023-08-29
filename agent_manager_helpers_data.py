@@ -29,6 +29,7 @@ from superagi.models.organisation import Organisation
 from superagi.models.tool import Tool
 from agent_manager_helpers_resources import ResourceManager
 from superagi.helper.time_helper import get_time_difference
+from superagi.lib.logger import logger
 
 @dataclass
 class ListAgentOutput:
@@ -337,7 +338,7 @@ def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_re
             resources = resource_manager_obj.get_all_resources(execution_result.id)
 
     except Exception as e:
-        print(f"Error occurred while executing save scheduled agent tool: {e}" + traceback.print_exc()) 
+        logger.error(f"Error occurred while executing save scheduled agent tool: {e}" + traceback.print_exc()) 
         waitedResult = "Errored"
     finally:
         return {
