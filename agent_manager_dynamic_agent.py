@@ -15,7 +15,7 @@ class DynamicAgentToolInput(BaseModel):
     )
     wait_for_result: bool = Field(
         ...,
-        description="(Recommended) Wait for the agent to finish and return the results.",
+        description="(Recommend True) Wait for the agent to finish and return the results.",
     )
 
 

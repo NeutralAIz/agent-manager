@@ -292,6 +292,7 @@ def get_agent_execution_feed(agent_execution_id: int, session):
         "permissions": permissions
     }
 
+# like ('CREATED', 'RUNNING', 'PAUSED', 'COMPLETED', 'TERMINATED')
 def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_result: bool = True):
     """
     Execute the Save Scheduled Agent Tool.
@@ -325,7 +326,7 @@ def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_re
 
             if maxWaitTime <= currentWaitTime:
                 waitedResult = "Timeout ({maxWaitTime} seconds)"
-            elif execution_result.status in ['COMPLETED']:
+            elif execution_result.status == "COMPLETE":
                 waitedResult = "Success"
             else:
                 waitedResult = "Unknown"
