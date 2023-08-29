@@ -338,8 +338,8 @@ def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_re
             resources = resource_manager_obj.get_all_resources(execution_result.id)
 
     except Exception as e:
-        logger.error(f"Error occurred while executing save scheduled agent tool: {e}" + traceback.print_exc()) 
         waitedResult = "Errored"
+        logger.error(f"Error occurred while executing save scheduled agent tool: {e}" + traceback.print_exc()) 
     finally:
         return {
             'agent_id': target_agent_id,
