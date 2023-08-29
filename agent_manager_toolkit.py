@@ -12,43 +12,11 @@ class AgentManagerToolkit(BaseToolkit, ABC):
     name: str = "Agent Manager Toolkit"
     description: str = "Tools to view and interact with other SuperAGI agents in the same instance."
     dynamicAgentsOnLoad: List[BaseTool] = List[BaseTool]
-
-    # def __init__(self):
-    #     super().__init__()        
-    #     try:            
-    #         self.name = "Agent Manager Toolkit"
-    #         logger.info(f"pluginName : {self.name}")
-
-    #         targetDynamicAgentToolkit = DynamicAgentTool()
-    #         self.dynamicAgentsOnLoad = targetDynamicAgentToolkit.create_from_agents(self.name)
-            
-    #         logger.info(f"Initilizing dynamic agent tools. : {self.dynamicAgentsOnLoad}!")
-            
-    #         for dynamicAgent in self.dynamicAgentsOnLoad:
-    #             globals()[dynamicAgent.class_name] = dynamicAgent
-    #             locals()[dynamicAgent.class_name] = dynamicAgent
-    #             logger.info(f"Setting up local/global tool : {dynamicAgent}!")
-
-    #     except:
-    #         traceback.print_exc()
-
-    # def get_dynamic_agent_tool(self, class_name):
-    #     for dynamicAgent in self.dynamicAgentsOnLoad:
-    #         if class_name == dynamicAgent.class_name:
-    #             logger.error(f"Executing : {class_name}")
-    #             return dynamicAgent
-
         
     def get_tools(self) -> List[BaseTool]:
-        tools = [
-            ListAgentTool(), CurrentAgentTool(), NewRunAgentTool(), DynamicAgentTool(1), DynamicAgentTool(5), DynamicAgentTool(6)
+        return [
+            ListAgentTool(), CurrentAgentTool(), NewRunAgentTool(), DynamicAgentTool()
         ]
-        # try:
-        #     tools.extend(self.dynamicAgentsOnLoad)
-        # except:
-        #     traceback.print_exc()
-        # finally:
-        return tools
 
     def get_env_keys(self) -> List[str]:
         return []
