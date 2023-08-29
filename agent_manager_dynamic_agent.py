@@ -101,7 +101,7 @@ class DynamicAgentTool(BaseTool):
     #     finally:
     #         return dynamic_agent_toolkits
 
-    def _execute(self, target_agent_id: int):
+    def _execute(self, target_agent_id: int = -1, wait_for_result: bool = True):
         self.set_attributes()
         return execute_save_scheduled_agent_tool(self.toolkit_config.session, target_agent_id)
         
