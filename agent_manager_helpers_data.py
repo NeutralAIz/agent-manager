@@ -323,7 +323,7 @@ def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_re
                 currentWaitTime += 1
                 session.refresh(execution_result)
 
-            if execution_result.status in ['CREATED', 'RUNNING']:
+            if maxWaitTime <= currentWaitTime:
                 waitedResult = "Timeout ({maxWaitTime} seconds)"
             elif execution_result.status in ['COMPLETED']:
                 waitedResult = "Success"
