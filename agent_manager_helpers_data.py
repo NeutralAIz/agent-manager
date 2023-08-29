@@ -1,6 +1,6 @@
 from typing import Any, Optional, Union, List
 from datetime import datetime
-from time import time
+import time
 from sqlalchemy import func, or_, desc
 from sqlalchemy.sql import asc
 from agent_manager_helpers import json_serial
