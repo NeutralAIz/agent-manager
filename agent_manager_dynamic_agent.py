@@ -71,9 +71,9 @@ class DynamicAgentTool(BaseTool):
             if bool(target_tool):
                 agents = get_agents(session, target_tool.toolkit_id).agents
 
-                DynamicAgentTool.DynamicAgentToolDescription = "Run other agents as tools.\nAvailable Agents: (id, name, description):\n"
+                DynamicAgentTool.DynamicAgentToolDescription = "Run other agents as tools.\n\r<br>Available Agents: (id, name, description):\n\r<br>"
                 for agent in agents:
-                    DynamicAgentTool.DynamicAgentToolDescription = DynamicAgentTool.DynamicAgentToolDescription + f"{agent.id}, {agent.name}, {agent.description}\n"
+                    DynamicAgentTool.DynamicAgentToolDescription = DynamicAgentTool.DynamicAgentToolDescription + f"{agent.id}, {agent.name}, {agent.description}\n\r<br> | "
 
                 self.description = DynamicAgentTool.DynamicAgentToolDescription
         except:
