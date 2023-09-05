@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import Any, List, Type
+from typing import Any, Type
 from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
 import traceback
@@ -88,7 +88,7 @@ class DynamicAgentTool(BaseTool):
         
         files = resource_manager_obj.get_all_resources(self.agent_execution_id)
 
-        fileList: List[str] = List[str]
+        fileList: list[str] = list[str]
 
         for file in files:
             fileList.extend(file.name)
