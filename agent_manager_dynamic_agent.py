@@ -88,7 +88,7 @@ class DynamicAgentTool(BaseTool):
         
         files = resource_manager_obj.get_all_resources(self.agent_execution_id)
 
-        fileList: list[str] = list[str]
+        fileList: list[str] = []
 
         for file in files:
             fileList.extend(file.name)

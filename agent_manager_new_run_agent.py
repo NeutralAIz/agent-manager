@@ -41,7 +41,7 @@ class NewRunAgentTool(BaseTool):
     target_agent_id: int = None
     wait_for_result: bool = True
             
-    def _execute(self, target_agent_id: int, files_for_agent_run: list[str] = None, wait_for_result: bool = True):
+    def _execute(self, target_agent_id: int, files_for_agent_run: list[str] = [], wait_for_result: bool = True):
         """
         Execute the Save Scheduled Agent Tool.
         Returns:
