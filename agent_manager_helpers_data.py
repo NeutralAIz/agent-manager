@@ -304,7 +304,7 @@ def execute_save_scheduled_agent_tool(session, source_agent_id, source_agent_exe
         JSON representation of the agent ID
     """
 
-    logger.info(files_for_agent_run)
+    logger.info(f"execute_save_scheduled_agent_tool: fiels: {files_for_agent_run}")
 
     execution_result = None
     agent_execution_feed = None
