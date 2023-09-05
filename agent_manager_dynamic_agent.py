@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import Any, Type
+from typing import Any, List, Type
 from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
 import traceback
