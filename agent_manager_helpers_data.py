@@ -10,6 +10,8 @@ import json
 import traceback
 
 from pydantic import BaseModel
+from superagi.helper.resource_helper import ResourceHelper as sagiResourceHelper
+from superagi.helper.s3_helper import S3Helper
 
 from superagi.models.agent import Agent
 from superagi.models.agent_config import AgentConfiguration
@@ -30,6 +32,7 @@ from superagi.models.tool import Tool
 from agent_manager_helpers_resources import ResourceManager
 from superagi.helper.time_helper import get_time_difference
 from superagi.lib.logger import logger
+from unstructured.partition.auto import partition
 
 @dataclass
 class ListAgentOutput:
@@ -294,7 +297,7 @@ def get_agent_execution_feed(agent_execution_id: int, session):
     }
 
 # like ('CREATED', 'RUNNING', 'PAUSED', 'COMPLETED', 'TERMINATED')
-def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_result: bool = True):
+def execute_save_scheduled_agent_tool(session, source_agent_id, source_agent_execution_id, target_agent_id: int, files_for_agent_run: List(str) = None, wait_for_result: bool = True):
     """
     Execute the Save Scheduled Agent Tool.
     Returns:
@@ -311,6 +314,19 @@ def execute_save_scheduled_agent_tool(session, target_agent_id: int, wait_for_re
         
         # Creating a new execution of the target agent 
         agent_execution_created = create_agent_execution(target_agent_id, agent_config, session)
+
+        if(files_for_agent_run):
+            for file_for_agent_run in files_for_agent_run:
+                logger.info(f"get_file_content: file_name:{file_for_agent_run}")
+                try:
+                    final_path = sagiResourceHelper.get_agent_read_resource_path(file_for_agent_run, agent=Agent.get_agent_from_id(
+                        session=session, agent_id=source_agent_id), agent_execution=AgentExecution
+                                                                            .get_agent_execution_from_id(session=session,
+                                                                                                        agent_execution_id=source_agent_execution_id))
+                    sagiResourceHelper.make_written_file_resource(final_path, target_agent_id, agent_execution_created, session)
+                except:
+                    logger.error(f"Error occured.\n\n{traceback.format_exc()}")
+
 
         if wait_for_result:
             waitedResult = "Attempting Wait"

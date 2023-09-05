@@ -1,5 +1,5 @@
 import traceback
-from typing import Any, Type
+from typing import Any, List, Type, Optional
 
 from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
@@ -11,6 +11,10 @@ class NewRunAgentInput(BaseModel):
     target_agent_id: int = Field(
         ...,
         description="The agent id to create a run for.",
+    )
+    files_for_agent_run: Optional(List(str)) = Field(
+        ...,
+        description="A list of files to attach to the execution.",
     )
     wait_for_result: bool = Field(
         ...,
@@ -37,11 +41,11 @@ class NewRunAgentTool(BaseTool):
     target_agent_id: int = None
     wait_for_result: bool = True
             
-    def _execute(self, target_agent_id: int, wait_for_result: bool = True):
+    def _execute(self, target_agent_id: int, files_for_agent_run: List(str) = None, wait_for_result: bool = True):
         """
         Execute the Save Scheduled Agent Tool.
         Returns:
             JSON representation of the agent ID
         """
-        return execute_save_scheduled_agent_tool(self.toolkit_config.session, target_agent_id, wait_for_result)
+        return execute_save_scheduled_agent_tool(self.toolkit_config.session, self.agent_id, self.agent_execution_id, target_agent_id, files_for_agent_run, wait_for_result)
     
