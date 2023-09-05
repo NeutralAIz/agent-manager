@@ -12,7 +12,7 @@ class NewRunAgentInput(BaseModel):
         ...,
         description="The agent id to create a run for.",
     )
-    files_for_agent_run: Optional(List[str]) = Field(
+    files_for_agent_run: List[str] = Field(
         ...,
         description="A list of files to attach to the execution.",
     )
