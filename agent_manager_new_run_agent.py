@@ -12,7 +12,7 @@ class NewRunAgentInput(BaseModel):
         ...,
         description="The agent id to create a run for.",
     )
-    files_for_agent_run: Optional(List(str)) = Field(
+    files_for_agent_run: Optional(List[str]) = Field(
         ...,
         description="A list of files to attach to the execution.",
     )
@@ -41,7 +41,7 @@ class NewRunAgentTool(BaseTool):
     target_agent_id: int = None
     wait_for_result: bool = True
             
-    def _execute(self, target_agent_id: int, files_for_agent_run: List(str) = None, wait_for_result: bool = True):
+    def _execute(self, target_agent_id: int, files_for_agent_run: List[str] = None, wait_for_result: bool = True):
         """
         Execute the Save Scheduled Agent Tool.
         Returns:

@@ -297,7 +297,7 @@ def get_agent_execution_feed(agent_execution_id: int, session):
     }
 
 # like ('CREATED', 'RUNNING', 'PAUSED', 'COMPLETED', 'TERMINATED')
-def execute_save_scheduled_agent_tool(session, source_agent_id, source_agent_execution_id, target_agent_id: int, files_for_agent_run: List(str) = None, wait_for_result: bool = True):
+def execute_save_scheduled_agent_tool(session, source_agent_id, source_agent_execution_id, target_agent_id: int, files_for_agent_run: List[str] = None, wait_for_result: bool = True):
     """
     Execute the Save Scheduled Agent Tool.
     Returns:
