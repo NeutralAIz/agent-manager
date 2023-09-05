@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import Any, Type
+from typing import Any, List, Type
 from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
 import traceback
@@ -7,6 +7,7 @@ from agent_manager_helpers_data import get_agents, execute_save_scheduled_agent_
 from sqlalchemy.orm import sessionmaker
 from superagi.models.db import connect_db
 from superagi.lib.logger import logger
+from agent_manager_helpers_resources import ResourceManager
 
 class DynamicAgentToolInput(BaseModel):
     target_agent_id: int = Field(
@@ -34,6 +35,7 @@ class DynamicAgentTool(BaseTool):
     class_name: str = None
     file_name: str = None
     folder_name: str = None
+    agent_execution_id: int = None
 
     DynamicAgentToolName: str = "Dynamic Agent Tool"
     DynamicAgentToolDescription: str = ""
@@ -81,4 +83,14 @@ class DynamicAgentTool(BaseTool):
 
     def _execute(self, target_agent_id: int = -1, wait_for_result: bool = True):
         self.set_attributes()
-        return execute_save_scheduled_agent_tool(self.toolkit_config.session, target_agent_id, wait_for_result)
+
+        resource_manager_obj = ResourceManager(target_agent_id, self.toolkit_config.session)
+        
+        files = resource_manager_obj.get_all_resources(self.agent_execution_id)
+
+        fileList: List[str] = List[str]
+
+        for file in files:
+            fileList.extend(file.name)
+
+        return execute_save_scheduled_agent_tool(self.toolkit_config.session, self.agent_id, self.agent_execution_id, target_agent_id, fileList, wait_for_result)
