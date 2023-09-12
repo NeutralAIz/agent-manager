@@ -18,7 +18,7 @@ class DynamicAgentToolInput(BaseModel):
         ...,
         description="(Recommend True) Wait for the agent to finish.",
     )
-    return_feed: Optional(bool) = Field(
+    return_feed: Optional[bool] = Field(
         ...,
         description="(Recommended for Errors) Return the result feed (requires wait for finish to be true).",
     )

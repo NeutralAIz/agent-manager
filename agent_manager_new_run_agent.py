@@ -20,7 +20,7 @@ class NewRunAgentInput(BaseModel):
         ...,
         description="(Recommended) Wait for the agent to finish",
     )
-    return_feed: Optional(bool) = Field(
+    return_feed: Optional[bool] = Field(
         ...,
         description="Return the result feed (requires wait for finish to be true).",
     )
