@@ -16,9 +16,13 @@ class NewRunAgentInput(BaseModel):
         ...,
         description="A list of files to attach to the execution.",
     )
-    wait_for_result: bool = Field(
+    wait_for_complete: bool = Field(
         ...,
-        description="(Recommended) Wait for the agent to finish and return the results.",
+        description="(Recommended) Wait for the agent to finish",
+    )
+    return_feed: Optional(bool) = Field(
+        ...,
+        description="Return the result feed (requires wait for finish to be true).",
     )
 
 class NewRunAgentTool(BaseTool):
@@ -41,11 +45,11 @@ class NewRunAgentTool(BaseTool):
     target_agent_id: int = None
     wait_for_result: bool = True
             
-    def _execute(self, target_agent_id: int, files_for_agent_run: list[str] = [], wait_for_result: bool = True):
+    def _execute(self, target_agent_id: int, files_for_agent_run: list[str] = [], wait_for_complete: bool = True, return_feed: bool = True):
         """
         Execute the Save Scheduled Agent Tool.
         Returns:
             JSON representation of the agent ID
         """
-        return execute_save_scheduled_agent_tool(self.toolkit_config.session, self.agent_id, self.agent_execution_id, target_agent_id, files_for_agent_run, wait_for_result)
+        return execute_save_scheduled_agent_tool(self.toolkit_config.session, self.agent_id, self.agent_execution_id, target_agent_id, files_for_agent_run, wait_for_complete, return_feed)
     

@@ -297,7 +297,7 @@ def get_agent_execution_feed(agent_execution_id: int, session):
     }
 
 # like ('CREATED', 'RUNNING', 'PAUSED', 'COMPLETED', 'TERMINATED')
-def execute_save_scheduled_agent_tool(session, source_agent_id, source_agent_execution_id, target_agent_id: int, files_for_agent_run: list[str] = [], wait_for_result: bool = True):
+def execute_save_scheduled_agent_tool(session, source_agent_id, source_agent_execution_id, target_agent_id: int, files_for_agent_run: list[str] = [], wait_for_complete: bool = True, return_feed: bool = False):
     """
     Execute the Save Scheduled Agent Tool.
     Returns:
@@ -331,7 +331,7 @@ def execute_save_scheduled_agent_tool(session, source_agent_id, source_agent_exe
                     logger.error(f"Error occured.\n\n{traceback.format_exc()}")
 
 
-        if wait_for_result:
+        if wait_for_complete:
             waitedResult = "Attempting Wait"
             maxWaitTime = 60 * 10 #seconds * minutes
             currentWaitTime = 0
@@ -351,7 +351,8 @@ def execute_save_scheduled_agent_tool(session, source_agent_id, source_agent_exe
             else:
                 waitedResult = "Unknown"
 
-            agent_execution_feed = get_agent_execution_feed(agent_execution_created.id, session)
+            if return_feed:
+                agent_execution_feed = get_agent_execution_feed(agent_execution_created.id, session)
 
             resource_manager_obj = ResourceManager(target_agent_id, session)
             resources = resource_manager_obj.get_all_resources(execution_result.id)
