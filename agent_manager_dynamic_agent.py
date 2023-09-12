@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import Any, List, Type
+from typing import Any, List, Type, Optional
 from pydantic import BaseModel, Field
 from superagi.tools.base_tool import BaseTool
 import traceback
@@ -14,9 +14,13 @@ class DynamicAgentToolInput(BaseModel):
         ...,
         description="The Id of the agent to execute.\n",
     )
-    wait_for_result: bool = Field(
+    wait_for_complete: bool = Field(
         ...,
-        description="(Recommend True) Wait for the agent to finish and return the results.",
+        description="(Recommend True) Wait for the agent to finish.",
+    )
+    return_feed: Optional(bool) = Field(
+        ...,
+        description="(Recommended for Errors) Return the result feed (requires wait for finish to be true).",
     )
 
 
@@ -31,7 +35,8 @@ class DynamicAgentTool(BaseTool):
     description: str = ""
     args_schema: Type[DynamicAgentToolInput] = DynamicAgentToolInput
     agent_id: int = None
-    wait_for_result: bool = True
+    wait_for_complete: bool = True
+    return_feed: bool = True
     class_name: str = None
     file_name: str = None
     folder_name: str = None
@@ -81,7 +86,7 @@ class DynamicAgentTool(BaseTool):
         except:
             logger.error(traceback.print_exc())
 
-    def _execute(self, target_agent_id: int = -1, wait_for_result: bool = True):
+    def _execute(self, target_agent_id: int = -1, wait_for_complete: bool = True, return_feed: bool = False):
         self.set_attributes()
 
         resource_manager_obj = ResourceManager(target_agent_id, self.toolkit_config.session)
@@ -93,4 +98,4 @@ class DynamicAgentTool(BaseTool):
         for file in files:
             fileList.extend(file.name)
 
-        return execute_save_scheduled_agent_tool(self.toolkit_config.session, self.agent_id, self.agent_execution_id, target_agent_id, fileList, wait_for_result)
+        return execute_save_scheduled_agent_tool(self.toolkit_config.session, self.agent_id, self.agent_execution_id, target_agent_id, fileList, wait_for_complete, return_feed)
